@@ -142,15 +142,17 @@ def generateCfg2(iteration):
         config.write(result)
     return Minindex + 4
 
-def getScore(tmp):
+def getScore(tmp, source):
     ####################need to be changed#####################################
     stringCfg = "../Tetris.cfg"
-    dump1 = "baseline/serial0.txt"
+    dump1 = "baseline/dump0.txt"
     dump2 = "plain1.txt"
     callgraph1 = "baseline/callgraph0.txt"
     callgraph2 = "callgraph1.txt"
     log = "trabish.txt"
+    source = source[3:]
     ins = getInstruction()
+    ins[0] = "-injars " + source + "\n"
     result = ins[0]  + ins[2] + ins[3] + "-ignorewarnings\n" + ins[4] + ins[5] + ins[6] + ins[7] + ins[8]
 
     for i in range(15):
@@ -178,18 +180,13 @@ def getScore(tmp):
     classinfo1 = RecordClass.recordClass(dump1)
     classinfo2 = RecordClass.recordClass(dump2)
     mapping = GetMapping.getMapping(classinfo1, classinfo2)
-    score = GetDistance.getDistance(mapping, callgraph1, callgraph2)
-
+    score1, score2, score3 = GetDistance.getDistance(mapping, callgraph1, callgraph2)
+    score = score1 + score2 + score3
     return score
 
 
-def getR8Dex(model, iteration):
+def getR8Dex(model, iteration, source, target):
     stringCfg =  "../Tetris.cfg"
-    # dump1 = "baseline/Tetrisr0.txt"
-    # dump2 = "Tetrisr8.txt"
-    # callgraph1 = "baseline/Callgraphr0.txt"
-    # callgraph2 = "Callgraphr8.txt"
-
     ########################need to be modified when the sample is changed.#################################
     dump1 = "baseline/serial0.txt";
     dump2 = "plaint1.txt";
@@ -264,12 +261,12 @@ def getR8Dex(model, iteration):
             for i in range(len(selectioninfo)):
                 writer.writerow([selectioninfo[i], scores[i]])
     elif(model == 3):  # ga
-        population_size = 50
+        population_size = 20               #default population size is 20 and iteration is 10.
         chromosome_length = 15
         pc = 0.6
         pm = 0.01
         ga = GA(population_size, chromosome_length, pc, pm)
-        ga.run(iteration)
+        ga.run(iteration, source, target)
     else:
         print("To be expected")
 
@@ -279,3 +276,59 @@ def getR8Dex(model, iteration):
 #     classinfo2 = RecordClass.recordClass(dump2)
 #     mapping = GetMapping.getMapping(classinfo1, classinfo2)
 #     GetDistance.getDistance(mapping, callgraph1, callgraph2)
+
+def generateBaseline(source):
+    # get baseline directory
+
+    # get origin configuration file
+    target = "../R80.cfg"
+    callgraph = "baseline/callgraph0.txt"
+    classfile = "baseline/classes.dex"
+    dumpfile = "baseline/dump0.txt"
+
+    instruction = getInstruction()
+    source = source[3:]
+    instruction[0] = "-injars " + source + "\n"
+    cfg_content = instruction[0] + instruction[2] + instruction[3] + instruction[4] + instruction[5] + instruction[6] + \
+                  instruction[7] + instruction[8] + instruction[12]
+    with open(target, 'w') as originConfig:
+        originConfig.write(cfg_content)
+
+    cmd = "java -jar ../r8.jar --release --output baseline" + "/ --pg-conf " + target
+    p = Popen(cmd, shell=True)
+    p.wait()
+    if p.returncode != 0:
+        print("Error")
+        return -1
+    p.kill()
+
+    GetMapping.getPerDump(classfile, dumpfile)
+    callGraph.callGraph(dumpfile, callgraph)
+
+
+def generateCfg(source, target):
+    # 1. get baseline directory!
+    generateBaseline(source)
+    getR8Dex(3, 10, source, target)
+    # 2. call main function to get the proper configuration file
+    # default number of generation iteration  is 10 and populaiton is 20.
+
+def getCfg(source, tmp, target):
+    ins = getInstruction()
+    source = source[3:]
+    ins[0] = "-injars " + source + "\n"
+    result = ins[0] + ins[2] + ins[3] + "-ignorewarnings\n" + ins[4] + ins[5] + ins[6] + ins[7] + ins[8]
+
+    for i in range(15):
+        i1 = i + 4
+        if (tmp[i] == 1):
+            if (i1 == 4 or i1 == 5 or i1 == 6 or i1 == 7 or i1 == 8):
+                result = result.replace(ins[i1], "")
+            else:
+                result = result + ins[i1]
+
+    with open(target, "w") as f:
+        f.write(result)
+
+
+

@@ -43,10 +43,10 @@ class GA(object):
             temporary.append(total)
         return temporary
 
-    def function(self, population):
+    def function(self, population, source):
         function1 = []
         for i in range(self.population_size):
-            function1.append(GetR8Dex.getScore(population[i]))
+            function1.append(GetR8Dex.getScore(population[i], source))
 
         return function1
 
@@ -55,7 +55,7 @@ class GA(object):
 
         fitness_value = []
         for i in range(self.population_size):
-            fitness_value.append(1.0/function1[i])
+            fitness_value.append(function1[i])
 
         return fitness_value
 
@@ -110,6 +110,7 @@ class GA(object):
             else:
                 fitin += 1
         index = fitness_value.index(max(fitness_value))
+        print(max(fitness_value))
         new_pop[0] = population[index]
 
         return new_pop
@@ -150,7 +151,7 @@ class GA(object):
                 else:
                     population[i][mpoint] = 1
 
-    def run(self,iteration):
+    def run(self,iteration, source, target):
 
         result_population = [[]]
         result_score = [[]]
@@ -160,10 +161,9 @@ class GA(object):
 
         for i in range(iteration):
 
-            print(i)
             population1 = copy.deepcopy(population)
             result_population.append(population1)
-            function_value = self.function(population)
+            function_value = self.function(population, source)
 
             result_score.append(function_value)
 
@@ -181,6 +181,9 @@ class GA(object):
         result_population = result_population[1:]
         result_score = result_score[1:]
         result_fitness = result_fitness[1:]
+
+        index = fitness_value.index(max(fitness_value))
+        GetR8Dex.getCfg(source, population[index], target)
 
         ##################write to file#################
         with open("ga_population.csv", "w") as csvfile:

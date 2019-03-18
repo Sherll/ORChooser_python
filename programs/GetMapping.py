@@ -29,8 +29,6 @@ def getDump(dump1, dump2):
     p.kill()
 
 def getPerDump(source, dump):
-    if(os.path.exists(dump)):
-        os.remove(dump)
     cmd = "../build-tools/26.0.1/dexdump -d -h " + source + " > " + dump
     p = Popen(cmd, shell=True)
     p.wait()
@@ -329,9 +327,9 @@ def evaluateClass(point, classinfo1, classinfo2):
 
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     # r0 is the baseline we don't have to calculate it every time.
-    GetR8Dex.getR8Dex(1, 1)   # 1 for randomly chosen
+#    GetR8Dex.getR8Dex(1, 1)   # 1 for randomly chosen
     #GetR8Dex.getR8Dex(2, 100)    # 2 for greedy chosen, this mode the latter integer takes no interest.
     #GetR8Dex.getR8Dex(3, 50)
     #callGraph.callGraph("../output/baseline/scimark0.txt", "../output/baseline/callgraph0.txt")
