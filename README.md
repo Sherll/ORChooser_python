@@ -7,6 +7,8 @@ obfuscator to replace ProGuard while developing Android application. By now, ORC
 
 ORChooser takes original program as input, finally give out the most proper configuration file for corresponding Java obfuscator. This tool can be used with two modes and the specific command can be got with '-h':
 
+>cd programs
+
 >python3 programs/ORChooser.py -h 
 
 >python3 programs/ORChooser.py -j Result/ -d ../benchmarks/Compress.jar
