@@ -9,11 +9,11 @@ ORChooser takes original program as input, finally give out the most proper conf
 
 >cd programs
 
->python3 programs/ORChooser.py -h 
+>python3 ORChooser.py -h 
 
->python3 programs/ORChooser.py -j Result/ -d ../benchmarks/Compress.jar
+>python3 ORChooser.py -j Result/ -d ../benchmarks/Compress.jar
 
->python3 programs/ORChooser.py -o Test.cfg -d ../benchmarks/Compress.jar
+>python3 ORChooser.py -o Test.cfg -d ../benchmarks/Compress.jar
 
 '-j' means the final file is obfuscated dalvik bytecode and it will be stored into a directory.
 '-o' means the final file is the obfuscated configuration file
